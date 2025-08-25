@@ -11,18 +11,24 @@ from sqlalchemy.orm import Session
 from sqlalchemy import text 
 from app.routes.api import api_router
 
+def init_db(dev_mode: bool = True):
+    if dev_mode:
+        print("Development mode: Dropping and recreating all tables")
+        Base.metadata.drop_all(bind=engine)   
+        Base.metadata.create_all(bind=engine)
+
 # # Khởi tạo DB (tạo bảng nếu chưa có)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     print("Initializing database...")
-    # Tạo bảng nếu chưa có
-    Base.metadata.create_all(bind=engine)
+    init_db(dev_mode=True)   
     try:
         with engine.connect() as conn:
             conn.execute(text("SELECT 1"))   
         print("Database connected successfully")
     except Exception as e:
-        print(f"Database connection failed: {e}")    
+        print(f"Database connection failed: {e}")
+    
     yield
     print("Application shutdown")
 

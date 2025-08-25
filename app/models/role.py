@@ -1,0 +1,9 @@
+from sqlalchemy import Column, Integer, String
+from app.config.database import Base
+
+
+class Role(Base):
+    __tablename__ = "roles"
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    name = Column(String(100), unique=True, index=True, nullable=False)
+    
