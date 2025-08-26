@@ -20,3 +20,25 @@ def add_category(addDto: CreateCategoryDto, db: Session = Depends(get_db), curre
                         "description": newCat.description,
                         "user_id": newCat.addedBy
                     }, 200)
+@router.get("/getAll")
+def get_all(db: Session = Depends(get_db)):
+    cat = CategoryService.get_all(db)
+    result = [
+        {
+            "id": c.id,
+            "name": c.name,
+            "description": c.description,
+            "addedBy": c.addedBy
+        }
+        for c in cat
+    ]
+    return response(True, "Category sucess", result, 200)
+@router.get("/get/{cat_id}")
+def get_by_id(cat_id: int, db: Session = Depends(get_db)):
+    cat = CategoryService.get_cat_by_id(db, cat_id)
+    return response(True, "Get cat by id success", {
+        "id": cat.id,
+        "name": cat.name,
+        "description": cat.description,
+        "addedBy": cat.addedBy
+    }, 200)

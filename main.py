@@ -11,24 +11,40 @@ from sqlalchemy.orm import Session
 from sqlalchemy import text 
 from app.routes.api import api_router
 
-def init_db(dev_mode: bool = True):
-    if dev_mode:
-        print("Development mode: Dropping and recreating all tables")
-        Base.metadata.drop_all(bind=engine)   
-        Base.metadata.create_all(bind=engine)
+# def init_db(dev_mode: bool = True):
+#     if dev_mode:
+#         print("Development mode: Dropping and recreating all tables")
+#         Base.metadata.drop_all(bind=engine)   
+#         Base.metadata.create_all(bind=engine)
 
-# # Khởi tạo DB (tạo bảng nếu chưa có)
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    print("Initializing database...")
-    init_db(dev_mode=True)   
+# # # Khởi tạo DB (tạo bảng nếu chưa có)
+# @asynccontextmanager
+# async def lifespan(app: FastAPI):
+#     print("Initializing database...")
+#     init_db(dev_mode=True)   
+#     try:
+#         with engine.connect() as conn:
+#             conn.execute(text("SELECT 1"))   
+#         print("Database connected successfully")
+#     except Exception as e:
+#         print(f"Database connection failed: {e}")
+    
+#     yield
+#     print("Application shutdown")
+def init_db():
     try:
         with engine.connect() as conn:
-            conn.execute(text("SELECT 1"))   
+            conn.execute(text("SELECT 1"))
         print("Database connected successfully")
     except Exception as e:
         print(f"Database connection failed: {e}")
-    
+        raise e
+
+# Lifecycle của app
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    print("Initializing application...")
+    init_db()   
     yield
     print("Application shutdown")
 

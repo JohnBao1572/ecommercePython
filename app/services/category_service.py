@@ -16,4 +16,12 @@ class CategoryService:
             addedBy = currentUser.id
         )
         return CategoryRepository.create(db, newCategory)
-
+    @staticmethod
+    def get_all(db):
+        return CategoryRepository.get_all(db)
+    @staticmethod
+    def get_cat_by_id(db, cat_id: int):
+        cat = CategoryRepository.get_id(db, cat_id)
+        if not cat:
+            raise HTTPException(status_code=404, detail="Cat not found")
+        return cat
