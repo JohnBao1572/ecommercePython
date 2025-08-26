@@ -1,6 +1,16 @@
 from datetime import datetime, timedelta
+from fastapi import Depends, HTTPException
+from fastapi import security
 import jwt
+from app.config.database import get_db
 from app.config.settings import settings  
+from sqlalchemy.orm import Session
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+
+from app.models.user import User
+
+# oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auths/login")
+security = HTTPBearer()
 
 
 JWT_SECRET = settings.JWT_SECRET
@@ -28,3 +38,16 @@ def verify_token(token:str):
         return None
     except jwt.InvalidTokenError:
         return None
+    
+def get_current_user(
+    credentials: HTTPAuthorizationCredentials = Depends(security), 
+    db: Session = Depends(get_db)
+) -> User:
+    token = credentials.credentials  # Lấy token từ header Authorization
+    payload = verify_token(token)
+    if payload is None:
+        raise HTTPException(status_code=401, detail="Invalid or expired token")
+    user = db.query(User).filter(User.id == int(payload.get("sub"))).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    return user
