@@ -25,4 +25,5 @@ class CategoryRepository:
     def delete(db, category: Category):
         db.delete(category)
         db.commit()
+        return category
         
